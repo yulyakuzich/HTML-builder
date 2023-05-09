@@ -1,33 +1,34 @@
 const fs = require('fs');
 const path = require('path');
 
-async function copyFiles() {
-  const srcDir = path.join(__dirname, 'files');
-  const destDir = path.join(__dirname, 'files-copy');
+async function copyFolder() {
+  const source = path.join(__dirname, 'files');
+  const destination = path.join(__dirname, 'files-copy');
 
   try {
-    await fs.promises.access(destDir);
-    console.log(`Папка ${destDir} уже существует`);
-  } catch (error) {
-    if (error.code === 'ENOENT') {
-      await fs.promises.mkdir(destDir);
-      console.log(`Создана папка: ${destDir}`);
-    } else {
-      throw error;
+    if (await fs.promises.stat(destination)) {
+      await fs.promises.rm(destination, { recursive: true });
     }
-  }
+  } catch (err) {}
 
-  const files = await fs.promises.readdir(srcDir);
+  await fs.promises.mkdir(destination);
+
+  const files = await fs.promises.readdir(source, { withFileTypes: true });
 
   for (const file of files) {
-    const srcPath = path.join(srcDir, file);
-    const destPath = path.join(destDir, file);
-    await fs.promises.copyFile(srcPath, destPath);
-    console.log(`Файл ${file} скопирован в ${destDir}`);
+    const sourcePath = path.join(source, file.name);
+    const destPath = path.join(destination, file.name);
+
+    if (file.isDirectory()) {
+      await fs.promises.mkdir(destPath, { recursive: true });
+      await copyFolderRecursive(sourcePath, destPath);
+    } else {
+      await fs.promises.copyFile(sourcePath, destPath);
+    }
   }
 }
 
-copyFiles();
+copyFolder();
 
 
 
