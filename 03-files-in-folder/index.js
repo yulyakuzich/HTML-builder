@@ -12,8 +12,10 @@ fs.readdir(path.join(__dirname, 'secret-folder'),
       fs.stat(path.join(__dirname, 'secret-folder', file.name), (err, stats) => {
         let size = 0
         size = stats.size;
-        let info = `name: ${file.name}, type: ${path.extname(file.name)}, size ${size} bite`
-        console.log(info);
+        let info = `name: ${file.name}, type: ${path.extname(file.name)}, size ${size} bite`;
+        if (stats.isFile()) {
+          console.log((info));
+        }
       });
       
     })
