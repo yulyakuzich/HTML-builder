@@ -23,3 +23,4 @@ rl.on('line', (input) => {
     console.log('Введите еще текст или введите "exit" для выхода:');
   }
 });
+process.on('exit', () => stdout.write('Удачи!'));
